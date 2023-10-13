@@ -1,0 +1,39 @@
+CREATE DATABASE test_data;
+CREATE TABLE test_data.crop_yield (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Reps INT,
+    Variable VARCHAR(15),
+    Yield DECIMAL(5, 2)
+);
+
+INSERT INTO test_data.crop_yield (Reps, Variable, Yield) VALUES
+    (1, 'Control', 116.08),
+    (2, 'Control', 132.85),
+    (3, 'Control', 115.98);
+
+INSERT INTO test_data.crop_yield (Reps, Variable, Yield) VALUES
+    (1, 'Treatment', 131.37),
+    (2, 'Treatment', 108.89),
+    (3, 'Treatment', 100.35);
+    
+ALTER TABLE test_data.crop_yield 
+ADD COLUMN Yield_corrected DECIMAL(10, 2);
+
+UPDATE test_data.crop_yield
+SET Yield_corrected = CASE
+    WHEN Variable='Control' THEN Yield-20
+    WHEN Variable='Treatment' THEN Yield+10
+    ELSE Yield
+END;
+
+ALTER TABLE test_data.crop_yield 
+ADD COLUMN Yield_moisture DECIMAL(10, 2);
+
+UPDATE test_data.crop_yield
+SET Yield_moisture= CASE
+    WHEN Variable='Control' THEN Yield_corrected-Yield_corrected*0.15
+    WHEN Variable='Treatment' THEN Yield_corrected-Yield_corrected*0.15
+    ELSE Yield_corrected
+END;
+
+SELECT * FROM test_data.crop_yield;
