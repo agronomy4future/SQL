@@ -1,0 +1,76 @@
+/* create data table for Yield */
+CREATE TABLE YieldData (
+    ID VARCHAR(10),
+    Treatment VARCHAR(10),
+    Block VARCHAR(10),
+    Yield INT
+);
+
+INSERT INTO YieldData (ID, Treatment, Block, Yield) VALUES 
+('A', 'TR1', 'I', 100),
+('B', 'TR2', 'I', 90),
+('C', 'TR3', 'I', 80),
+('D', 'TR4', 'I', 57),
+('A', 'TR1', 'II', 98),
+('B', 'TR2', 'II', 92),
+('C', 'TR3', 'II', 78),
+('D', 'TR4', 'II', 62),
+('A', 'TR1', 'III', 110),
+('B', 'TR2', 'III', 98),
+('C', 'TR3', 'III', 89),
+('D', 'TR4', 'III', 77);
+
+select * from dbo.YieldData;
+
+
+/* create data table for Biomass */
+
+CREATE TABLE BiomassData (
+    ID VARCHAR(10),
+    Treatment VARCHAR(10),
+    Block VARCHAR(10),
+    Biomass FLOAT
+)
+
+INSERT INTO BiomassData (ID, Treatment, Block, Biomass) VALUES 
+('A', 'TR1', 'I', 750.0),
+('B', 'TR2', 'I', 675.0),
+('C', 'TR3', 'I', 600.0),
+('D', 'TR4', 'I', 427.5),
+('A', 'TR1', 'II', 735.0),
+('B', 'TR2', 'II', 690.0),
+('C', 'TR3', 'II', 585.0),
+('D', 'TR4', 'II', 465.0),
+('A', 'TR1', 'III', 825.0),
+('B', 'TR2', 'III', 735.0),
+('C', 'TR3', 'III', 667.5),
+('D', 'TR4', 'III', 577.5);
+
+select * from dbo.YieldData;
+
+
+/* Merge two datasets */
+
+WITH YieldData_mean AS (
+    SELECT 
+        Treatment,
+        AVG(Yield) AS Yield_mean,
+        STDEV(Yield) / SQRT(COUNT(*)) AS Yield_standard_error
+    FROM dbo.YieldData
+    GROUP BY Treatment
+), BiomassData_mean AS (
+    SELECT 
+        Treatment,
+        AVG(Biomass) AS Biomass_mean,
+        STDEV(Biomass) / SQRT(COUNT(*)) AS Biomass_standard_error
+    FROM dbo.BiomassData
+    GROUP BY Treatment
+)
+SELECT 
+    YieldData_mean.Treatment,
+    YieldData_mean.Yield_mean,
+    YieldData_mean.Yield_standard_error,
+    BiomassData_mean.Biomass_mean,
+    BiomassData_mean.Biomass_standard_error
+FROM YieldData_mean
+LEFT JOIN BiomassData_mean ON YieldData_mean.Treatment = BiomassData_mean.Treatment;
