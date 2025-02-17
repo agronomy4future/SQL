@@ -1,0 +1,57 @@
+# create database
+create database code_test;
+
+
+# create data table
+create table code_test.df (
+    id int auto_increment primary key,
+    treatment varchar(10),
+    root_biomass float,
+    total_biomass float
+);
+
+insert into code_test.df (treatment, root_biomass, total_biomass) VALUES
+('N0', 4.429, 6.951),('N0', 2.848, 3.998),('N0', 5.627, 9.001),
+('N0', 4.279, 5.983),('N0', 5.051, 7.004),('N1', 6.123, 9.876),
+('N1', 4.765, 8.453),('N1', 5.908, 10.234),('N1', 3.987, 6.876),
+('N1', 4.569, 7.983),('N2', 7.456, 12.345),('N2', 5.987, 10.654),
+('N2', 6.234, 11.876),('N2', 4.876, 9.123),('N2', 5.765, 10.345),
+('N3', 8.123, 14.234),('N3', 6.876, 12.876),('N3', 7.543, 13.654),
+('N3', 5.987, 11.234),('N3', 6.654, 12.098);
+
+
+# data summary
+select treatment,
+round(avg(root_biomass),2) as `Root Dry weight`,
+round(avg(total_biomass),2) as 'Total Dry weight'
+from code_test.df
+group by treatment;
+
+
+# data summary excluding treatment N3
+select treatment,
+round(avg(root_biomass),2) as `Root Dry weight`,
+round(avg(total_biomass),2) as 'Total Dry weight'
+from code_test.df
+where treatment!= "N3"
+group by treatment;
+
+
+# create temporary data table
+use code_test;
+
+create temporary table filtered_data as
+select * from code_test.df
+where treatment!= "N3";
+
+
+# data summary excluding treatment N3 from the temporary table
+select treatment,
+round(avg(root_biomass),2) as `Root Dry weight`,
+round(avg(total_biomass),2) as 'Total Dry weight'
+from filtered_data
+group by treatment;
+
+
+# delete the temporary table
+drop temporary table filtered_data;
